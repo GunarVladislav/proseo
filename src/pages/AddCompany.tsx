@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Link, FileText, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Link, FileText, Plus, Trash2, Brain } from "lucide-react";
 import { Header } from "@/components/Layout/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -56,6 +56,21 @@ export const AddCompany = () => {
       ...prev,
       phones: prev.phones.map((phone, i) => i === index ? value : phone)
     }));
+  };
+
+  const handleAnalyze = async () => {
+    toast({
+      title: "Анализ запущен",
+      description: "AI анализирует данные компании...",
+    });
+    
+    // Здесь будет вызов API для анализа
+    setTimeout(() => {
+      toast({
+        title: "Анализ завершен",
+        description: "Рекомендации по оптимизации готовы",
+      });
+    }, 2000);
   };
 
   const handleSubmit = () => {
@@ -168,69 +183,71 @@ export const AddCompany = () => {
             </Card>
           )}
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Основная информация</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-2 gap-4">
+          {mode === "new" && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Основная информация</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="name">Название компании</Label>
+                    <Input
+                      id="name"
+                      value={formData.name}
+                      onChange={(e) => setFormData(prev => ({...prev, name: e.target.value}))}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="category">Категория</Label>
+                    <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({...prev, category: value}))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Выберите категорию" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cafe">Кафе и рестораны</SelectItem>
+                        <SelectItem value="auto">Автосервис</SelectItem>
+                        <SelectItem value="beauty">Красота и здоровье</SelectItem>
+                        <SelectItem value="retail">Торговля</SelectItem>
+                        <SelectItem value="services">Услуги</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
                 <div>
-                  <Label htmlFor="name">Название компании</Label>
+                  <Label htmlFor="address">Адрес</Label>
                   <Input
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => setFormData(prev => ({...prev, name: e.target.value}))}
+                    id="address"
+                    value={formData.address}
+                    onChange={(e) => setFormData(prev => ({...prev, address: e.target.value}))}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="category">Категория</Label>
-                  <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({...prev, category: value}))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Выберите категорию" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="cafe">Кафе и рестораны</SelectItem>
-                      <SelectItem value="auto">Автосервис</SelectItem>
-                      <SelectItem value="beauty">Красота и здоровье</SelectItem>
-                      <SelectItem value="retail">Торговля</SelectItem>
-                      <SelectItem value="services">Услуги</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="address">Адрес</Label>
-                <Input
-                  id="address"
-                  value={formData.address}
-                  onChange={(e) => setFormData(prev => ({...prev, address: e.target.value}))}
-                />
-              </div>
 
-              <div>
-                <Label>Телефоны</Label>
-                {formData.phones.map((phone, index) => (
-                  <div key={index} className="flex gap-2 mt-2">
-                    <Input
-                      placeholder="+7 (999) 123-45-67"
-                      value={phone}
-                      onChange={(e) => updatePhone(index, e.target.value)}
-                    />
-                    {formData.phones.length > 1 && (
-                      <Button variant="outline" size="icon" onClick={() => removePhone(index)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                ))}
-                <Button variant="outline" size="sm" onClick={addPhone} className="mt-2">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Добавить телефон
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+                <div>
+                  <Label>Телефоны</Label>
+                  {formData.phones.map((phone, index) => (
+                    <div key={index} className="flex gap-2 mt-2">
+                      <Input
+                        placeholder="+7 (999) 123-45-67"
+                        value={phone}
+                        onChange={(e) => updatePhone(index, e.target.value)}
+                      />
+                      {formData.phones.length > 1 && (
+                        <Button variant="outline" size="icon" onClick={() => removePhone(index)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  <Button variant="outline" size="sm" onClick={addPhone} className="mt-2">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Добавить телефон
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {mode === "new" && (
             <>
@@ -350,6 +367,10 @@ export const AddCompany = () => {
           <div className="flex gap-4">
             <Button onClick={handleSubmit} className="flex-1">
               Сохранить компанию
+            </Button>
+            <Button variant="secondary" onClick={handleAnalyze} className="flex-1">
+              <Brain className="h-4 w-4 mr-2" />
+              Анализировать через AI
             </Button>
             <Button variant="outline" onClick={() => setMode(null)}>
               Отмена
